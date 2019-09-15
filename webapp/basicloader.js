@@ -1,3 +1,8 @@
+window.en_words = [];
+window.en_words.length = 0;
+window.pl_words = [];
+window.pl_words.length = 0;
+
 function Load(path, id) {
 	var file = new XMLHttpRequest();
 	file.open('GET', path, false);
@@ -23,9 +28,6 @@ function parse_config_file(pth, id)
 	document.getElementById(id).innerHTML = "Wczytywanie...";
 	var file = new XMLHttpRequest();
 	file.open('GET', pth, false);
-	var words = Array(new word);
-	words.length = 0;
-	console.log("Initial size: " + words.length);
 	file.onreadystatechange = function()
 	{
 		if(file.readyState == 4)
@@ -98,7 +100,7 @@ function parse_config_file(pth, id)
 						else
 						{
 							var eng = "";
-							var pol = new polish_translation;
+							var pol = [];
 							/* Line buffer contains word definitions */
 							var k = 0;
 							while(k < line.length && line[k] != '=')
@@ -110,6 +112,8 @@ function parse_config_file(pth, id)
 							while(k < line.length && line[k] == ' ') k++;
 							k++;
 							while(k < line.length && line[k] == '=') k++;
+							/* Push english word */
+							window.en_words.push(eng);
 							var pol_word = "";
 							while(k < line.length)
 							{
@@ -120,19 +124,10 @@ function parse_config_file(pth, id)
 								}
 								k++;
 								pol_word = pol_word.trim();
-								pol.add(pol_word);
+								pol.push(pol_word);
 								pol_word = "";
 							}
-							var tmp = new word;
-							tmp.fill(eng, pol);
-							words.push(tmp);
-							var text = "words.length: " + words.length;
-							//for(var x = 0; x < words[words.length - 1].pl.length; x++)
-							//{
-							//	text += words[words.length - 1].pl[x];
-							//	text += ", ";
-							//}
-							console.log(text);
+							window.pl_words.push(pol);
 						}
 					}
 					line = "";
@@ -142,15 +137,14 @@ function parse_config_file(pth, id)
 					returnstr = "<font face=\"Cantarell\" size=5 color=\"white\">Wybierz tryb</font><br>\n" + returnstr;
 					returnstr += "<button type=\"button\" onclick=\"appmain(\'pl-en\', \'contents\')\">[ Polski ---> Angielski ]</button><br>";
 					returnstr += "<button type=\"button\" onclick=\"appmain(\'en-pl\', \'contents\')\">[ Angielski ---> Polski ]</button><br>";
-					window.words = words;
 					/* DEBUG: print data */
 					var str = "Word definition data:\n";
-					for(var a = 0; a < window.words.length; a++)
+					for(var a = 0; a < window.en_words.length; a++)
 					{
-						str += "en: " + window.words[a].en + ", pl: ";
-						for(var b = 0; b < window.words[a].pl.translations.length; b++)
+						str += "en: " + window.en_words[a] + ", pl: ";
+						for(var b = 0; b < window.pl_words[a].length; b++)
 						{
-							str += words[a].pl.translations[b] + ", ";
+							str += window.pl_words[a][b] + ", ";
 						}
 						str += '\n';
 					}
